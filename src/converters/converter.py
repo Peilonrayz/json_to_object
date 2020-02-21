@@ -1,32 +1,41 @@
 from datetime import datetime
-from typing import Generic, TypeVar, Type, get_type_hints, Union, List, Optional, Tuple, Any
+from typing import (
+    Any,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    get_type_hints,
+)
+
+__all__ = ["ron", "Converter", "Converters"]
 
 
-__all__ = ['ron', 'Converter', 'Converters']
-
-
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class BuilderObject:
     def __init__(self):
-        super().__setattr__('__values', {})
+        super().__setattr__("__values", {})
 
     def __getattr__(self, name):
-        return super().__getattribute__('__values').setdefault(name, BuilderObject())
+        return super().__getattribute__("__values").setdefault(name, BuilderObject())
 
     def __setattr__(self, name, value):
-        super().__getattribute__('__values')[name] = value
+        super().__getattribute__("__values")[name] = value
 
     def __delattr__(self, name):
-        del super().__getattribute__('__values')[name]
+        del super().__getattribute__("__values")[name]
 
 
 def _build(base: Type[T], values: Union[BuilderObject, dict]) -> T:
     """Build the object recursively, utilizes the type hints to create the correct types"""
     types = get_type_hints(base)
     if isinstance(values, BuilderObject):
-        values = super(BuilderObject, values).__getattribute__('__values')
+        values = super(BuilderObject, values).__getattribute__("__values")
     for name, value in values.items():
         if isinstance(value, BuilderObject) and name in types:
             values[name] = _build(types[name], value)
@@ -35,7 +44,7 @@ def _build(base: Type[T], values: Union[BuilderObject, dict]) -> T:
 
 def _get_args(obj: object, orig: Type) -> Optional[Tuple[Type]]:
     """Get args from obj, filtering by orig type"""
-    bases = getattr(type(obj), '__orig_bases__', [])
+    bases = getattr(type(obj), "__orig_bases__", [])
     for b in bases:
         if b.__origin__ is orig:
             return b.__args__
@@ -50,15 +59,15 @@ class Converter(Generic[T]):
         for name, value in kwargs.items():
             setattr(self, name, value)
 
-    def build(self, exists_ok: bool=False) -> T:
+    def build(self, exists_ok: bool = False) -> T:
         """Build base object"""
         t = _get_args(self, Converter)
         if t is None:
-            raise ValueError('No base')
+            raise ValueError("No base")
         base_cls = t[0]
         if isinstance(self._obj, base_cls):
             if not exists_ok:
-                raise TypeError('Base type has been built already.')
+                raise TypeError("Base type has been built already.")
             return self._obj
         self._obj = _build(base_cls, self._obj)
         return self._obj
@@ -87,7 +96,7 @@ class Converters:
         """Convert from public path formats to internal one"""
         if isinstance(path, list):
             return path
-        return path.split('.')
+        return path.split(".")
 
     @staticmethod
     def _get(obj: Any, path: List[str]) -> Any:
@@ -103,7 +112,7 @@ class Converters:
 
         You can convert/type check the data using `get_fn` and `set_fn`. Both take and return one value.
         """
-        p = ['_obj'] + cls._read_path(path)
+        p = ["_obj"] + cls._read_path(path)
 
         def get(self):
             value = ron(cls._get(self, p))
@@ -124,6 +133,7 @@ class Converters:
     @classmethod
     def to_datetime(cls, path: TPath, format: str):
         """Convert to and from the date format specified"""
+
         def get_fn(value: datetime) -> str:
             return value.strftime(format)
 
@@ -135,6 +145,7 @@ class Converters:
     @classmethod
     def from_datetime(cls, path: TPath, format: str):
         """Convert to and from the date format specified"""
+
         def get_fn(value: str) -> datetime:
             return datetime.strptime(value, format)
 

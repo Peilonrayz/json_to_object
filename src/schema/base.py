@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple, Optional, Union
+from typing import Optional, Tuple, Union
 
 
 @dataclass
@@ -19,7 +19,7 @@ class SequenceType:
 
     def indexed(self, key: int) -> Type:
         if self.length is not None and key >= self.length:
-            raise KeyError('key exceeds length of SequenceType')
+            raise KeyError("key exceeds length of SequenceType")
         if key < len(self.positional):
             return self.positional[key]
         return self.repeat[(key - len(self.positional)) % len(self.repeat)]
@@ -37,17 +37,17 @@ class MappingType:
     values: SequenceType
     properties: dict
 
-    def indexed(self, key: int, *, longest: bool=False) -> Tuple[Type, Type]:
+    def indexed(self, key: int, *, longest: bool = False) -> Tuple[Type, Type]:
         if not longest:
             return self.keys.indexed(key), self.values.indexed(key)
 
         key_ = _nullable_less_than(self.keys.length, key)
         value_ = _nullable_less_than(self.values.length, key)
         if key_ and value_:
-            raise KeyError('key exceeds length of MappingType')
+            raise KeyError("key exceeds length of MappingType")
         return (
             self.keys.indexed(key) if key_ else None,
-            self.values.indexed(key) if value_ else None
+            self.values.indexed(key) if value_ else None,
         )
 
 

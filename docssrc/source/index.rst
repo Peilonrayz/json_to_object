@@ -1,4 +1,4 @@
-Welcome to json_to_object's documentation!
+Welcome to JSON to Object's documentation!
 ==========================================
 
 .. toctree::

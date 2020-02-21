@@ -1,5 +1,3 @@
 from .schema import build
 
-__all__ = [
-    'build'
-]
+__all__ = ["build"]

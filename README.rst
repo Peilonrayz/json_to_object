@@ -1,4 +1,4 @@
-json_to_object
+JSON to Object
 ==============
 
 .. image:: https://travis-ci.com/Peilonrayz/json_to_object.svg?branch=master
@@ -8,7 +8,7 @@ json_to_object
 About
 -----
 
-This is a skeleton project to have a standardized and concrete base for all projects.
+Convert to and from Python and JSON.
 
 Installation
 ------------
@@ -37,4 +37,4 @@ To run all tests run ``nox``. No venv is needed; nox makes all of them for us.
 License
 -------
 
-json_to_object is available under the MIT license.
+JSON to Object is available under the MIT license.
